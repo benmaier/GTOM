@@ -2,8 +2,8 @@
 
 This package takes an undirected unweighted scipy.sparse adjacency matrix as an input and computes the GTOM(m) method, using m+1-step neighbors [1]. It's highly efficient and can be used for parallel computation by calling the function for only few neighbors at a time.
 
-[1] *Gene network interconnectedness and the generalized topological overlap measure*
-A M Yip and S Horvath, BMC Bioinformatics20078:22 (2007)
+[1] *Gene network interconnectedness and the generalized topological overlap measure*,
+A. M. Yip and S. Horvath, BMC Bioinformatics20078:22 (2007)
 
 ## Install
 
