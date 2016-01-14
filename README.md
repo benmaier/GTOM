@@ -1,4 +1,4 @@
-# General Topological Overlap Matrix #
+# General Topological Overlap Measure #
 
 This package takes an undirected unweighted scipy.sparse adjacency matrix as an input and computes the GTOM(m) method, using m+1-step neighbors [1]. It's highly efficient and can be used for parallel computation by calling the function for only few neighbors at a time.
 
