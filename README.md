@@ -17,6 +17,7 @@ A M Yip and S Horvath, BMC Bioinformatics20078:22 (2007)
 
 import matplotlib.pyplot as pl
 import networkx as nx
+from gtom import gtom
 
 G = nx.Graph()
 G.add_edges_from([(0,1),(1,2),(0,3),(0,4),(0,5),(0,7),
