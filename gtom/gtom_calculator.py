@@ -17,9 +17,10 @@ from gtom import *
 
 class GTOMCalc():
 
-    def __init__(A,numSteps,indices=[],verbose=False):
+    def __init__(self,A,numSteps,indices=[],verbose=False):
 
         self.A = A.copy()
+        self.numSteps = numSteps
         #construct matrix B, which encapsulates all neighbors reachable within a path length
         #of numSteps
         self.number_of_nodes = self.A.shape[0]
@@ -28,55 +29,57 @@ class GTOMCalc():
         self.verbose = verbose
 
         #get (NxN) identity
-        self.I = sprs.eye(number_of_nodes,format='csr')
+        self.I = sprs.eye(self.number_of_nodes,format='csr')
 
-        if numSteps==0:
-            return A + I
-        else:
+        if numSteps>0:
             numSteps -= 1
 
-        ###############
-        if self.verbose:
-            print "constructing S"
-            start = time.time()
-        ###############
+            ###############
+            if self.verbose:
+                print "constructing S"
+                start = time.time()
+            ###############
 
-        #Get path matrix (which nodes are reachable within numSteps+1 steps)
-        S = self.A
-        for m in range(numSteps):
-            S = self.A + S.dot(self.A)
+            #Get path matrix (which nodes are reachable within numSteps+1 steps)
+            S = self.A
+            for m in range(numSteps):
+                S = self.A + S.dot(self.A)
 
-        ###############
-        if self.verbose:
-            end = time.time()
-            print "time needed:", end-start
-        ##############
-
-
-        #get nonzero entries of path matrix
-        row,col = S.nonzero()
-        no_of_nonzero = len(row)
-        del S
+            ###############
+            if self.verbose:
+                end = time.time()
+                print "time needed:", end-start
+            ##############
 
 
+            #get nonzero entries of path matrix
+            row,col = S.nonzero()
+            no_of_nonzero = len(row)
+            del S
 
-        ##############
-        if self.verbose:
-            print "construct B"
-            print "number of nonzero entries of B:", no_of_nonzero
-            start = time.time()
-        ##############
 
-        #construct B Matrix
-        B_data = ones((no_of_nonzero,),dtype=uint32)
-        diagonal_entries = nonzero(row==col)[0]
-        B_data[diagonal_entries] = 0.
-        self.B = sprs.csr_matrix((B_data,(row,col)),shape=matrix_shape)
 
-        if self.verbose:
-            end = time.time()
-            print "time needed:", end-start
-    def compute_for_indices(indices=[]):
+            ##############
+            if self.verbose:
+                print "construct B"
+                print "number of nonzero entries of B:", no_of_nonzero
+                start = time.time()
+            ##############
+
+            #construct B Matrix
+            B_data = ones((no_of_nonzero,),dtype=uint32)
+            diagonal_entries = nonzero(row==col)[0]
+            B_data[diagonal_entries] = 0.
+            self.B = sprs.csr_matrix((B_data,(row,col)),shape=self.matrix_shape)
+
+            if self.verbose:
+                end = time.time()
+                print "time needed:", end-start
+            
+    def compute_for_indices(self,indices=[]):
+
+        if self.numSteps == 0:
+            return self.A + self.I
         
         ##############
         if self.verbose:
@@ -90,11 +93,11 @@ class GTOMCalc():
             B2_ = self.B[indices,:].dot(self.B)
             row,col = B2_.nonzero()
             row = array([ indices[r] for r in row ])
-            B2 = sprs.csr_matrix((B2_.data,(row,col)),shape=matrix_shape)
-            self_neighborhood = B.sum(axis=1).A1
+            B2 = sprs.csr_matrix((B2_.data,(row,col)),shape=self.matrix_shape)
+            self_neighborhood = self.B.sum(axis=1).A1
         else:
             B2 = self.B.dot(self.B)
-            self_neighborhood = B.sum(axis=1).A1
+            self_neighborhood = self.B.sum(axis=1).A1
 
         #get pairs reachable within 2*(numsteps+1) steps
         row,col = B2.nonzero()
@@ -111,7 +114,6 @@ class GTOMCalc():
 
         #get data for the numerator matrix as described in the paper
         numerator_matrix = B2 + self.A + self.I
-        del self.I
 
         #get pairs from the numerator matrix (this is the pairs of nodes for which
         #data is available)
@@ -151,7 +153,7 @@ class GTOMCalc():
 
         #compute final data
         GTOm_data = numerator_data / denominator_data
-        GTOm = sprs.csr_matrix((GTOm_data,(row,col)),shape=matrix_shape)
+        GTOm = sprs.csr_matrix((GTOm_data,(row,col)),shape=self.matrix_shape)
 
         ##############
         if self.verbose:
@@ -195,9 +197,9 @@ if __name__=="__main__":
     print "computed only for nodes 1 and 2:"
     print "       |\t(i,j)=(1,2)\t(i,j)=(1,3)\t(i,j)=(2,3)"
     print "---------------------------------------------------------"
-    gtom_calc = GTOMCalc(A,m)
     for m in range(3):
-        T = gtom_calc.calculate_for_indices(indices=[0,1])
+        gtom_calc = GTOMCalc(A,m)
+        T = gtom_calc.compute_for_indices(indices=[0,1])
         print " m = %d |\t%f\t%f\t%f" %(m,T[0,1],T[0,2],T[1,2])
 
 
