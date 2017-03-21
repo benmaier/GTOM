@@ -17,7 +17,7 @@ from gtom import *
 
 class GTOMCalc():
 
-    def __init__(self,A,numSteps,indices=[],verbose=False):
+    def __init__(self,A,numSteps,verbose=False):
 
         self.A = A.copy()
         self.numSteps = numSteps
