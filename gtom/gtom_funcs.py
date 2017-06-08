@@ -16,7 +16,7 @@ import time
 def gtom_verbose(A,numSteps,indices=[]):
     return gtom(A,numSteps,indices,verbose=True)
 
-def gtom(A,numSteps,indices=[],verbose=False):
+def gtom(A,numSteps,indices=[],verbose=False,callback=None):
     
     #construct matrix B, which encapsulates all neighbors reachable within a path length
     #of numSteps
@@ -35,6 +35,9 @@ def gtom(A,numSteps,indices=[],verbose=False):
     if verbose:
         print "constructing S"
         start = time.time()
+
+    if callback is not None:
+        callback("constructing S...")
     ###############
 
     #Get path matrix (which nodes are reachable within numSteps+1 steps)
@@ -61,6 +64,9 @@ def gtom(A,numSteps,indices=[],verbose=False):
         print "construct B"
         print "number of nonzero entries of B:", no_of_nonzero
         start = time.time()
+
+    if callback is not None:
+        callback("constructing B...")
     ##############
 
     #construct B Matrix
@@ -76,6 +82,8 @@ def gtom(A,numSteps,indices=[],verbose=False):
         print "time needed:", end-start
         print "construct B2"
         start = time.time()
+    if callback is not None:
+        callback("constructing B^2 (this can take a while)...")
     #############
 
     #compute the number of reachable nodes by computing B^2
@@ -100,6 +108,9 @@ def gtom(A,numSteps,indices=[],verbose=False):
         print "time needed:", end-start
         print "get relevant indices"
         start = time.time()
+
+    if callback is not None:
+        callback("getting relevant pairs...")
     ##############
 
 
@@ -125,6 +136,9 @@ def gtom(A,numSteps,indices=[],verbose=False):
         print "number of nonzero elements:",no_of_nonzero
         print "calculating denominator matrix"
         start = time.time()
+        
+    if callback is not None:
+        callback("calculating denominator matrix (this can take a while)...")
     ##############
 
     #compute the denominator matrix (for element-wise division)
@@ -137,6 +151,9 @@ def gtom(A,numSteps,indices=[],verbose=False):
         print "time needed:", end-start
         print "calculating GTOm matrix"
         start = time.time()
+
+    if callback is not None:
+        callback("calculating GTOM affinity matrix...")
     ##############
 
     #free some memory
