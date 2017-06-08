@@ -37,7 +37,7 @@ def gtom(A,numSteps,indices=[],verbose=False,callback=None):
         start = time.time()
 
     if callback is not None:
-        callback("constructing S...")
+        callback("constructing S matrix (this may take a while) ...")
     ###############
 
     #Get path matrix (which nodes are reachable within numSteps+1 steps)
@@ -66,7 +66,7 @@ def gtom(A,numSteps,indices=[],verbose=False,callback=None):
         start = time.time()
 
     if callback is not None:
-        callback("constructing B...")
+        callback("constructing B (this may take a while) ...")
     ##############
 
     #construct B Matrix
@@ -83,7 +83,7 @@ def gtom(A,numSteps,indices=[],verbose=False,callback=None):
         print "construct B2"
         start = time.time()
     if callback is not None:
-        callback("constructing B^2 (this can take a while)...")
+        callback("constructing B^2 ...")
     #############
 
     #compute the number of reachable nodes by computing B^2
@@ -110,7 +110,7 @@ def gtom(A,numSteps,indices=[],verbose=False,callback=None):
         start = time.time()
 
     if callback is not None:
-        callback("getting relevant pairs...")
+        callback("getting relevant pairs ...")
     ##############
 
 
@@ -138,7 +138,7 @@ def gtom(A,numSteps,indices=[],verbose=False,callback=None):
         start = time.time()
         
     if callback is not None:
-        callback("calculating denominator matrix (this can take a while)...")
+        callback("calculating denominator matrix ...")
     ##############
 
     #compute the denominator matrix (for element-wise division)
@@ -153,7 +153,7 @@ def gtom(A,numSteps,indices=[],verbose=False,callback=None):
         start = time.time()
 
     if callback is not None:
-        callback("calculating GTOM affinity matrix...")
+        callback("calculating GTOM affinity matrix ...")
     ##############
 
     #free some memory
