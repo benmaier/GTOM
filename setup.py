@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='gtom',
-      version='0.3',
+      version='0.4',
       description='computes the general topological overlap matrix of an undirected network',
       url='https://bitbucket.org/bfmaier/gtom',
       author='Benjamin Maier',
