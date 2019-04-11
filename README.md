@@ -1,9 +1,8 @@
-# General Topological Overlap Measure #
+# General Topological Overlap Measure
 
-This package takes an undirected unweighted scipy.sparse adjacency matrix as an input and computes the GTOM(m) method, using m+1-step neighbors [1]. It's highly efficient and can be used for parallel computation by calling the function for only few nodes at a time.
+This package takes an undirected unweighted scipy.sparse adjacency matrix as an input and computes the GTOM(m) method, using m+1-step neighbors (1). It's highly efficient and can be used for parallel computation by calling the function for only few nodes at a time.
 
-[1] [*Gene network interconnectedness and the generalized topological overlap measure*](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.93.329&rep=rep1&type=pdf),
-A. M. Yip and S. Horvath, BMC Bioinformatics 2007 8:22
+(1) [*Gene network interconnectedness and the generalized topological overlap measure*](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.93.329&rep=rep1&type=pdf), A. M. Yip and S. Horvath, BMC Bioinformatics 2007 8:22
 
 ## Install
 
@@ -43,7 +42,7 @@ print("       |\t(i,j)=(1,2)\t(i,j)=(1,3)\t(i,j)=(2,3)")
 print("---------------------------------------------------------")
 for m in range(3):
     T = gtom(A,m)
-    print " m = %d |\t%f\t%f\t%f" %(m,T[0,1],T[0,2],T[1,2])
+    print(" m = %d |\t%f\t%f\t%f" %(m,T[0,1],T[0,2],T[1,2]))
 
 pl.show()
 ```
