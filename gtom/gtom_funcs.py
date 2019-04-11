@@ -179,22 +179,24 @@ def gtom(A,numSteps,indices=[],verbose=False,callback=None):
 if __name__=="__main__":
     import pylab as pl
     import networkx as nx
+    import numpy as np
+    import scipy.sparse as sprs
 
+    edges = [(0,1),(1,2),(0,3),(0,4),(0,5),(0,7),
+             (1,3),(1,4),(1,6),(1,8),(1,9),(1,10),
+             (5,6),(7,8)]
     G = nx.Graph()
-    G.add_edges_from([(0,1),(1,2),(0,3),(0,4),(0,5),(0,7),
-                      (1,3),(1,4),(1,6),(1,8),(1,9),(1,10),
-                      (5,6),(7,8)])
+    G.add_edges_from(edges)
 
-    print("nodes:", G.nodes())
     pos = nx.spring_layout(G)
     labels = { n:str(n+1) for n in G.nodes()}
     nx.draw(G,pos=pos)
     nx.draw_networkx_labels(G,pos=pos,labels=labels)
-    
-
 
     N = G.number_of_nodes()
-    A = nx.to_scipy_sparse_matrix(G)
+    edges = np.array(edges,dtype=int)
+    A = sprs.csc_matrix((np.ones((edges.shape[0],)),(edges[:,0],edges[:,1])),dtype=float,shape=(N,N))
+    A += A.T
 
     print("recreate results from figure 3 in [1]")
     print("       |\t(i,j)=(1,2)\t(i,j)=(1,3)\t(i,j)=(2,3)")
