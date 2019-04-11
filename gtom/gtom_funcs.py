@@ -33,7 +33,7 @@ def gtom(A,numSteps,indices=[],verbose=False,callback=None):
 
     ###############
     if verbose:
-        print "constructing S"
+        print("constructing S")
         start = time.time()
 
     if callback is not None:
@@ -48,7 +48,7 @@ def gtom(A,numSteps,indices=[],verbose=False,callback=None):
     ###############
     if verbose:
         end = time.time()
-        print "time needed:", end-start
+        print("time needed:", end-start)
     ##############
 
 
@@ -61,8 +61,8 @@ def gtom(A,numSteps,indices=[],verbose=False,callback=None):
 
     ##############
     if verbose:
-        print "construct B"
-        print "number of nonzero entries of B:", no_of_nonzero
+        print("construct B")
+        print("number of nonzero entries of B:", no_of_nonzero)
         start = time.time()
 
     if callback is not None:
@@ -79,8 +79,8 @@ def gtom(A,numSteps,indices=[],verbose=False,callback=None):
     ##############
     if verbose:
         end = time.time()
-        print "time needed:", end-start
-        print "construct B2"
+        print("time needed:", end-start)
+        print("construct B2")
         start = time.time()
     if callback is not None:
         callback("constructing B^2 ...")
@@ -103,10 +103,10 @@ def gtom(A,numSteps,indices=[],verbose=False,callback=None):
 
     ##############
     if verbose:
-        print "number of nonzero entries of B2:", len(row)
+        print("number of nonzero entries of B2:", len(row))
         end = time.time()
-        print "time needed:", end-start
-        print "get relevant indices"
+        print("time needed:", end-start)
+        print("get relevant indices")
         start = time.time()
 
     if callback is not None:
@@ -127,14 +127,14 @@ def gtom(A,numSteps,indices=[],verbose=False,callback=None):
 
     ##############
     if verbose:
-        print "number of FLOs:, ", len(row), ";   expected time:",\
+        print("number of FLOs:, ", len(row), ";   expected time:",\
               3.3344888285918445e-06*len(row),"s (",3.3344888285918445e-06*len(row)/60.,"min; or ",\
-              3.3344888285918445e-06*len(row)/3600., "h)" 
+              3.3344888285918445e-06*len(row)/3600., "h)") 
 
         end = time.time()
-        print "time needed:", end-start
-        print "number of nonzero elements:",no_of_nonzero
-        print "calculating denominator matrix"
+        print("time needed:", end-start)
+        print("number of nonzero elements:",no_of_nonzero)
+        print("calculating denominator matrix")
         start = time.time()
         
     if callback is not None:
@@ -148,8 +148,8 @@ def gtom(A,numSteps,indices=[],verbose=False,callback=None):
     ##############
     if verbose:
         end = time.time()
-        print "time needed:", end-start
-        print "calculating GTOm matrix"
+        print("time needed:", end-start)
+        print("calculating GTOm matrix")
         start = time.time()
 
     if callback is not None:
@@ -167,7 +167,7 @@ def gtom(A,numSteps,indices=[],verbose=False,callback=None):
     ##############
     if verbose:
         end = time.time()
-        print "time needed for GTOm matrix:", end-start
+        print("time needed for GTOm matrix:", end-start)
     ##############
 
     return GTOm
@@ -184,7 +184,7 @@ if __name__=="__main__":
                       (1,3),(1,4),(1,6),(1,8),(1,9),(1,10),
                       (5,6),(7,8)])
 
-    print "nodes:", G.nodes()
+    print("nodes:", G.nodes())
     pos = nx.spring_layout(G)
     labels = { n:str(n+1) for n in G.nodes()}
     nx.draw(G,pos=pos)
@@ -195,20 +195,20 @@ if __name__=="__main__":
     N = G.number_of_nodes()
     A = nx.to_scipy_sparse_matrix(G)
 
-    print "recreate results from figure 3 in [1]"
-    print "       |\t(i,j)=(1,2)\t(i,j)=(1,3)\t(i,j)=(2,3)"
-    print "---------------------------------------------------------"
+    print("recreate results from figure 3 in [1]")
+    print("       |\t(i,j)=(1,2)\t(i,j)=(1,3)\t(i,j)=(2,3)")
+    print("---------------------------------------------------------")
     for m in range(3):
         T = gtom(A,m)
-        print " m = %d |\t%f\t%f\t%f" %(m,T[0,1],T[0,2],T[1,2])
+        print(" m = %d |\t%f\t%f\t%f" %(m,T[0,1],T[0,2],T[1,2]))
 
-    print 
-    print "computed only for nodes 1 and 2:"
-    print "       |\t(i,j)=(1,2)\t(i,j)=(1,3)\t(i,j)=(2,3)"
-    print "---------------------------------------------------------"
+    print() 
+    print("computed only for nodes 1 and 2:")
+    print("       |\t(i,j)=(1,2)\t(i,j)=(1,3)\t(i,j)=(2,3)")
+    print("---------------------------------------------------------")
     for m in range(3):
         T = gtom(A,m,indices=[0,1])
-        print " m = %d |\t%f\t%f\t%f" %(m,T[0,1],T[0,2],T[1,2])
+        print(" m = %d |\t%f\t%f\t%f" %(m,T[0,1],T[0,2],T[1,2]))
 
 
     #print T[0,1], T[0,2], T[1,2]
