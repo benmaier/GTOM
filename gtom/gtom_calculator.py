@@ -1,5 +1,5 @@
 #################################
-# (c) 2015 Benjamin Maier
+## (c) 2015 Benjamin Maier
 #################################
 # computes the "Generalized topological overlap" measure as described in [1]
 #
@@ -11,29 +11,28 @@ from __future__ import print_function
 
 
 import scipy.sparse as sprs
-import numpy as np
+from numpy import *
 import time
 
-from gtom import gtom
-
+from gtom import *
 
 class GTOMCalc():
 
-    def __init__(self, A, numSteps, verbose=False):
+    def __init__(self,A,numSteps,verbose=False):
 
         self.A = A.copy()
         self.numSteps = numSteps
-        # construct matrix B, which encapsulates all neighbors reachable within a path length
-        # of numSteps
+        #construct matrix B, which encapsulates all neighbors reachable within a path length
+        #of numSteps
         self.number_of_nodes = self.A.shape[0]
         self.matrix_shape = self.A.shape
 
         self.verbose = verbose
 
-        # get (NxN) identity
-        self.I = sprs.eye(self.number_of_nodes, format='csr')
+        #get (NxN) identity
+        self.I = sprs.eye(self.number_of_nodes,format='csr')
 
-        if numSteps > 1:
+        if numSteps>0:
             numSteps -= 1
 
             ###############
@@ -68,9 +67,11 @@ class GTOMCalc():
                 start = time.time()
             ##############
 
-            # construct B Matrix
-            self.B.data[:] = 1
-            self.B.setdiag(values=0)
+            #construct B Matrix
+            B_data = ones((no_of_nonzero,),dtype=uint32)
+            diagonal_entries = nonzero(row==col)[0]
+            B_data[diagonal_entries] = 0.
+            self.B = sprs.csr_matrix((B_data,(row,col)),shape=self.matrix_shape)
 
             if self.verbose:
                 end = time.time()
@@ -80,28 +81,27 @@ class GTOMCalc():
 
         if self.numSteps == 0:
             return self.A + self.I
-
+        
         ##############
         if self.verbose:
             print("construct B2")
             start = time.time()
         #############
 
-        # compute the number of reachable nodes by computing B^2
-        # added functionality to compute the GTOm-index only for certain nodes
-        if len(indices) > 0:
-            B2_ = self.B[indices, :].dot(self.B)
-            row, col = B2_.nonzero()
-            row = np.array([indices[r] for r in row])
-            B2 = sprs.csr_matrix((B2_.data, (row, col)), shape=self.matrix_shape)
+        #compute the number of reachable nodes by computing B^2
+        #added functionality to compute the GTOm-index only for certain nodes
+        if len(indices)>0:
+            B2_ = self.B[indices,:].dot(self.B)
+            row,col = B2_.nonzero()
+            row = array([ indices[r] for r in row ])
+            B2 = sprs.csr_matrix((B2_.data,(row,col)),shape=self.matrix_shape)
             self_neighborhood = self.B.sum(axis=1).A1
-            del B2_
         else:
             B2 = self.B.dot(self.B)
             self_neighborhood = self.B.sum(axis=1).A1
 
-        # get pairs reachable within 2*(numsteps+1) steps
-        row, col = B2.nonzero()
+        #get pairs reachable within 2*(numsteps+1) steps
+        row,col = B2.nonzero()
 
         ##############
         if self.verbose:
@@ -112,14 +112,16 @@ class GTOMCalc():
             start = time.time()
         ##############
 
-        # get data for the numerator matrix as described in the paper
+
+        #get data for the numerator matrix as described in the paper
         numerator_matrix = B2 + self.A + self.I
 
-        # get pairs from the numerator matrix (this is the pairs of nodes for which
-        # data is available)
-        row, col = numerator_matrix.nonzero()
+        #get pairs from the numerator matrix (this is the pairs of nodes for which
+        #data is available)
+        row,col = numerator_matrix.nonzero()
         numerator_data = numerator_matrix.data
         no_of_nonzero = len(row)
+
 
         ##############
         if self.verbose:
@@ -134,9 +136,9 @@ class GTOMCalc():
             start = time.time()
         ##############
 
-        # compute the denominator matrix (for element-wise division)
-        one = np.ones((no_of_nonzero,), dtype=np.float32)
-        denominator_data = one + np.minimum(self_neighborhood[row], self_neighborhood[col]) - self.A[row, col].A1
+        #compute the denominator matrix (for element-wise division)
+        one = ones((no_of_nonzero,),dtype=float32)    
+        denominator_data = one + minimum(self_neighborhood[row],self_neighborhood[col]) - self.A[row,col].A1
 
         ##############
         if self.verbose:
@@ -146,13 +148,13 @@ class GTOMCalc():
             start = time.time()
         ##############
 
-        # free some memory
+        #free some memory
         del B2
         del one
 
-        # compute final data
-        gtom_data = numerator_data / denominator_data
-        gtom = sprs.csr_matrix((gtom_data, (row, col)), shape=self.matrix_shape)
+        #compute final data
+        GTOm_data = numerator_data / denominator_data
+        GTOm = sprs.csr_matrix((GTOm_data,(row,col)),shape=self.matrix_shape)
 
         ##############
         if self.verbose:
@@ -160,23 +162,27 @@ class GTOMCalc():
             print("time needed for GTOm matrix:", end-start)
         ##############
 
-        return gtom
+        return GTOm
 
 
-if __name__ == "__main__":
+
+
+if __name__=="__main__":
     import pylab as pl
     import networkx as nx
 
     G = nx.Graph()
-    G.add_edges_from([(0, 1), (1, 2), (0, 3), (0, 4), (0, 5), (0, 7),
-                      (1, 3), (1, 4), (1, 6), (1, 8), (1, 9), (1, 10),
-                      (5, 6), (7, 8)])
+    G.add_edges_from([(0,1),(1,2),(0,3),(0,4),(0,5),(0,7),
+                      (1,3),(1,4),(1,6),(1,8),(1,9),(1,10),
+                      (5,6),(7,8)])
 
     print("nodes:", G.nodes())
     pos = nx.spring_layout(G)
-    labels = {n: str(n + 1) for n in G.nodes()}
-    nx.draw(G, pos=pos)
-    nx.draw_networkx_labels(G, pos=pos, labels=labels)
+    labels = { n:str(n+1) for n in G.nodes()}
+    nx.draw(G,pos=pos)
+    nx.draw_networkx_labels(G,pos=pos,labels=labels)
+    
+
 
     N = G.number_of_nodes()
     A = nx.to_scipy_sparse_matrix(G)
@@ -198,12 +204,12 @@ if __name__ == "__main__":
         print(" m = %d |\t%f\t%f\t%f" %(m,T[0,1],T[0,2],T[1,2]))
 
 
-    # print T[0,1], T[0,2], T[1,2]
-    # T = gtom(A,m)
-    # print T[10,0], T[10,2], T[10,8]
+    #print T[0,1], T[0,2], T[1,2]
+    #T = gtom(A,m)
+    #print T[10,0], T[10,2], T[10,8]
 
     pl.show()
 
-    # G2 = nx.Graph()
-    # G2.add_edges_from([])
-    # pl.show()
+    #G2 = nx.Graph()
+    #G2.add_edges_from([])
+    #pl.show()
