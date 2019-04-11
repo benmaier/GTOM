@@ -7,6 +7,7 @@
 # Detecting Modules in Gene Networks
 # by Andy M. Yip, Steve Horvath
 # https://labs.genetics.ucla.edu/horvath/GTOM/old/GTOM_tech_report.pdf
+from __future__ import print_function
 
 
 import scipy.sparse as sprs
